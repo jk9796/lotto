@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로또 번호 생성기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .main-generator {
+            text-align: center;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            border: none;
+            color: white;
+            font-size: 1.3em;
+            font-weight: bold;
+            padding: 20px 50px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255,140,0,0.4);
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255,140,0,0.6);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .numbers-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            min-height: 100px;
+            align-items: center;
+        }
+
+        .ball {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: bounce 0.6s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .ball.yellow { background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); }
+        .ball.blue { background: linear-gradient(135deg, #4169e1 0%, #6495ed 100%); }
+        .ball.red { background: linear-gradient(135deg, #dc143c 0%, #ff6347 100%); }
+        .ball.gray { background: linear-gradient(135deg, #696969 0%, #a9a9a9 100%); }
+        .ball.green { background: linear-gradient(135deg, #32cd32 0%, #90ee90 100%); }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .fixed-numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .number-btn {
+            aspect-ratio: 1;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1em;
+        }
+
+        .number-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        .number-btn.fixed {
+            background: #ffd700;
+            border-color: #ffd700;
+            color: #333;
+            transform: scale(1.1);
+        }
+
+        .fixed-display {
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .fixed-display span {
+            display: inline-block;
+            background: #ffd700;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-weight: bold;
+        }
+
+        .multi-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .multi-controls label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .multi-controls input {
+            width: 80px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .multi-btn {
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            border: none;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .multi-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(236,72,153,0.4);
+        }
+
+        .generated-sets {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .set-row {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .set-label {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #333;
+            min-width: 30px;
+        }
+
+        .set-balls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .small-ball {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2em; }
+            .ball { width: 60px; height: 60px; font-size: 1.5em; }
+            .fixed-numbers-grid { grid-template-columns: repeat(7, 1fr); }
+            .small-ball { width: 45px; height: 45px; font-size: 1em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎰 로또 번호 생성기 🎰</h1>
+            <p>AI가 추천하는 행운의 번호</p>
+        </div>
+
+        <div class="card main-generator">
+            <button class="generate-btn" onclick="generateMain()">🔄 번호 생성하기</button>
+            <div class="numbers-display" id="mainNumbers"></div>
+        </div>
+
+        <div class="card">
+            <div class="section-title">🔒 고정 번호 설정 (최대 5개)</div>
+            <div class="fixed-numbers-grid" id="fixedGrid"></div>
+            <div class="fixed-display" id="fixedDisplay" style="display: none;">
+                고정된 번호: <span id="fixedList"></span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title">✨ 여러 조합 생성하기</div>
+            <div class="multi-controls">
+                <label>생성 개수:</label>
+                <input type="number" id="countInput" value="5" min="1" max="10">
+                <button class="multi-btn" onclick="generateMultiple()">생성</button>
+            </div>
+            <div class="generated-sets" id="generatedSets"></div>
+        </div>
+
+        <div class="footer">
+            💡 복권은 순수한 확률 게임입니다. 책임감 있게 즐기세요!
+        </div>
+    </div>
+
+    <script>
+        var fixedNumbers = [];
+
+        function getBallColor(num) {
+            if (num <= 10) return 'yellow';
+            if (num <= 20) return 'blue';
+            if (num <= 30) return 'red';
+            if (num <= 40) return 'gray';
+            return 'green';
+        }
+
+        function generateNumbers(fixed) {
+            if (!fixed) fixed = [];
+            var available = [];
+            for (var i = 1; i <= 45; i++) {
+                if (fixed.indexOf(i) === -1) {
+                    available.push(i);
+                }
+            }
+
+            var needed = 6 - fixed.length;
+            var selected = [];
+
+            for (var i = 0; i < needed; i++) {
+                var idx = Math.floor(Math.random() * available.length);
+                selected.push(available[idx]);
+                available.splice(idx, 1);
+            }
+
+            var result = fixed.concat(selected);
+            result.sort(function(a, b) { return a - b; });
+            return result;
+        }
+
+        function generateMain() {
+            var numbers = generateNumbers(fixedNumbers);
+            var container = document.getElementById('mainNumbers');
+            container.innerHTML = '';
+
+            numbers.forEach(function(num, idx) {
+                var ball = document.createElement('div');
+                ball.className = 'ball ' + getBallColor(num);
+                ball.textContent = num;
+                ball.style.animationDelay = (idx * 0.1) + 's';
+                container.appendChild(ball);
+            });
+        }
+
+        function initFixedGrid() {
+            var grid = document.getElementById('fixedGrid');
+            for (var i = 1; i <= 45; i++) {
+                var btn = document.createElement('button');
+                btn.className = 'number-btn';
+                btn.textContent = i;
+                btn.setAttribute('data-num', i);
+                btn.onclick = function() {
+                    toggleFixed(parseInt(this.getAttribute('data-num')));
+                };
+                btn.id = 'btn-' + i;
+                grid.appendChild(btn);
+            }
+        }
+
+        function toggleFixed(num) {
+            var idx = fixedNumbers.indexOf(num);
+            if (idx > -1) {
+                fixedNumbers.splice(idx, 1);
+            } else {
+                if (fixedNumbers.length < 5) {
+                    fixedNumbers.push(num);
+                } else {
+                    return;
+                }
+            }
+
+            updateFixedDisplay();
+        }
+
+        function updateFixedDisplay() {
+            fixedNumbers.sort(function(a, b) { return a - b; });
+
+            for (var i = 1; i <= 45; i++) {
+                var btn = document.getElementById('btn-' + i);
+                if (fixedNumbers.indexOf(i) > -1) {
+                    btn.classList.add('fixed');
+                } else {
+                    btn.classList.remove('fixed');
+                }
+            }
+
+            var display = document.getElementById('fixedDisplay');
+            var list = document.getElementById('fixedList');
+
+            if (fixedNumbers.length > 0) {
+                display.style.display = 'block';
+                list.innerHTML = fixedNumbers.map(function(n) {
+                    return '<span>' + n + '</span>';
+                }).join('');
+            } else {
+                display.style.display = 'none';
+            }
+        }
+
+        function generateMultiple() {
+            var count = parseInt(document.getElementById('countInput').value);
+            var container = document.getElementById('generatedSets');
+            container.innerHTML = '';
+
+            for (var i = 0; i < count; i++) {
+                var numbers = generateNumbers(fixedNumbers);
+                var row = document.createElement('div');
+                row.className = 'set-row';
+
+                var label = document.createElement('div');
+                label.className = 'set-label';
+                label.textContent = String.fromCharCode(65 + i);
+                row.appendChild(label);
+
+                var balls = document.createElement('div');
+                balls.className = 'set-balls';
+                numbers.forEach(function(num) {
+                    var ball = document.createElement('div');
+                    ball.className = 'small-ball ' + getBallColor(num);
+                    ball.textContent = num;
+                    balls.appendChild(ball);
+                });
+
+                row.appendChild(balls);
+                container.appendChild(row);
+            }
+        }
+
+        initFixedGrid();
+    </script>
+</body>
+</html>
